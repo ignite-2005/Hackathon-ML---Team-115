@@ -1,6 +1,6 @@
 pandas
 numpy
-scikit-learn>=1.2
+scikit-learn==1.9.1
 folium
 fastapi
 uvicorn
@@ -12,3 +12,7 @@ matplotlib>=3.6
 pyarrow
 pyproj
 shapely>=2
+scipy
+networkx
+httpx
+markdown
