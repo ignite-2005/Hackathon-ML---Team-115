@@ -85,7 +85,9 @@ def score_candidates(estimator, candidates):
     """Return one positive-class probability per candidate, in input order."""
     if candidates.empty:
         return np.empty(0, dtype=float)
-    matrix = candidates[FEATURE_COLUMNS].astype(np.float32, copy=False)
+    matrix = candidates[FEATURE_COLUMNS]
+    if not matrix.dtypes.eq(np.float32).all():
+        matrix = matrix.astype(np.float32)
     positive = np.flatnonzero(estimator.classes_ == 1).item()
     return estimator.predict_proba(matrix)[:, positive]
 
