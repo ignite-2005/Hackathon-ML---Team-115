@@ -1,0 +1,16 @@
+{
+  "emission": "gaussian",
+  "sigma_m": 7.354,
+  "beta_m": 1.701,
+  "w": 1.0,
+  "gap_threshold_s": 60.0,
+  "radius_m": 50.0,
+  "max_k": 16,
+  "neg_tol_m": 30.0,
+  "max_speed_ms": 50.0,
+  "slack_m": 100.0,
+  "skip_k": 0.0,
+  "fill_s": 0.0,
+  "max_loop_m": 50.0,
+  "notes": "sigma and beta estimated on train labels (label_quality_ok trips only), not tuned yet. emission switches to 'classifier' when a model is passed to decode_trip. skip_k and fill_s are off: both lowered or did not change Top-1 on student_test / train 2."
+}

@@ -1,0 +1,9 @@
+{
+  "sigma_m": 7.354,
+  "beta_m": 1.701,
+  "neg_tol_m": 30.0,
+  "max_speed_ms": 50.0,
+  "slack_m": 100.0,
+  "estimated_on": "train (label_quality_ok trips only)",
+  "n_true_transitions": 180204
+}
