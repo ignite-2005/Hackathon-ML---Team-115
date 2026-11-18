@@ -11,13 +11,13 @@ on two laptops: a FastAPI backend (model, decoder, server-side evaluation) and a
 GPS track + road network
    -> candidates (arcs within 50 m, nearest 16)            src/candidates.py
    -> 8 features per (point, arc)                          src/candidate_features.py
-   -> Random forest P(arc is correct)                      src/train_models.py
+   -> tuned Random forest P(arc is correct)                src/train_models.py, tuning/
    -> HMM emissions + road-graph transitions -> Viterbi    hmm/
    -> predicted arc per point + driven route               api/pipeline.py
 ```
 
-Results on the 10 `student_test` trips through the API: **Top-1 accuracy 93.00%**
-(classifier only: 85.47%). Route F1 is 94.3% and route continuity is 92.3% (both weighted by GPS
+Results on the 10 `student_test` trips through the API: **Top-1 accuracy 93.16%**
+(classifier only: 85.57%). Route F1 is 93.7% and route continuity is 92.1% (both weighted by GPS
 points). See `results/api/student_test_pipeline_results.csv`.
 
 ## Repository layout
@@ -26,13 +26,14 @@ points). See `results/api/student_test_pipeline_results.csv`.
 | --- | --- | --- |
 | `src/` | Data loading and inventory (`load_data.py`), EDA plots and Folium maps (`eda.py`), per-trip metric projection (`geo.py`), candidate generation and labels (`candidates.py`), radius sweep (`radius_sweep.py`), features (`candidate_features.py`), model training and comparison (`train_models.py`, `neural_network_curve.py`) | A, B |
 | `hmm/` | Road graph, HMM states, emissions, transitions, Viterbi, edge cases, route building, metrics, decoder entry point (`decode.py`), map of a decoded trip (`map_trip.py`), config (`hmm_config.json`) | C |
-| `tuning/` | Bayesian optimisation (Optuna) | C |
+| `tuning/` | Bayesian optimisation of the Random forest (Optuna: `hpo.py`, `evaluate_tuned.py`, `study.db`) | C |
 | `api/` | FastAPI backend (`main.py`) and the inference pipeline (`pipeline.py`) | D |
 | `ui/` | Streamlit evaluator UI (`app.py`) | D |
 | `deploy/` | `run_api.ps1` (Laptop 1) and `run_ui.ps1` (Laptop 2) | D |
 | `tests/` | Unit tests (`test_person_b.py`, `test_api.py`) | B, D |
 | `outputs/` | EDA, candidate, sweep and HMM outputs (CSV, PNG, Folium HTML) | A, C |
-| `results/` | Final model `person_b_final/best_model.joblib`, model comparison results, API results and console log (`results/api/`) | B, D |
+| `models/` | Deployed model `rf_tuned.joblib` (Optuna-tuned Random forest) and `best_params.json` | C |
+| `results/` | Model comparison results and the untuned model (`person_b_final/`), API results and console log (`api/`) | B, D |
 | `report/` | Report sections (Markdown), figures, `build_report.py` and the combined PDF | all |
 
 The dataset is **not** in the repository. Put it anywhere and pass its path to the scripts.
@@ -56,8 +57,10 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
-`scikit-learn` is pinned to **1.8.0**, the version `best_model.joblib` was saved with. Keep it
-the same on Laptop 1, otherwise unpickling warns and predictions may change.
+`scikit-learn` is pinned to **1.9.1**, the version the deployed `models/rf_tuned.joblib` was
+saved with. Keep it the same on Laptop 1, otherwise unpickling warns and predictions may change.
+The API loads the model named by `model_path` in `hmm/hmm_config.json`. To serve another bundle,
+set `PATHSNAP_MODEL`.
 
 ## Reproducing the pipeline
 
@@ -70,6 +73,7 @@ Run from the repository root. `DATA` = path to the `Student folder` that contain
 | Candidates and labels | `python src/candidates.py DATA outputs/candidates` | parquet files and miss-rate summaries |
 | Radius sweep (train) | `python src/radius_sweep.py DATA outputs/sweep` | `radius_sweep_train.csv/png` |
 | Model comparison | `python -m src.train_models DATA --output results/person_b_final` | comparison table, plots, `best_model.joblib` |
+| Bayesian optimisation | `python tuning/hpo.py run DATA --trials 50`, `python tuning/hpo.py report`, `python tuning/evaluate_tuned.py DATA` | `models/rf_tuned.joblib`, `outputs/tuning/` |
 | HMM / Viterbi | `python hmm/viterbi.py DATA` | `outputs/hmm/viterbi_student_test.csv` |
 | Full pipeline offline | `python api/pipeline.py DATA/student_test --out results/api/student_test_pipeline_results.csv` | per-trip Top-1 and route metrics |
 | Tests | `python -m unittest tests.test_api tests.test_person_b` | |
