@@ -9,7 +9,14 @@ import pandas as pd
 
 from src.candidate_features import build_features
 from src.load_data import load_trip
-from src.train_models import compare, predict_trip, read_partition, resolve_student_folder, write_results
+from src.train_models import (
+    compare,
+    evaluate,
+    predict_trip,
+    read_partition,
+    resolve_student_folder,
+    write_results,
+)
 
 
 def write_trip(root, partition, trip_id, *, reverse=False, gap=False):
@@ -48,6 +55,13 @@ class ModelComparisonTest(unittest.TestCase):
             train, train_truth, excluded = read_partition(root, "train", {})
             test, test_truth, _ = read_partition(root, "student_test", {})
             self.assertEqual(int(test["label"].sum()), 3)
+            perfect = evaluate(test, test_truth, test["label"].to_numpy(dtype=float), probabilistic=True)
+            self.assertEqual(perfect["candidate_macro_f1"], 1.0)
+            self.assertEqual(perfect["candidate_precision"], 1.0)
+            self.assertEqual(perfect["candidate_recall"], 1.0)
+            self.assertEqual(perfect["top1_accuracy"], 0.75)
+            self.assertEqual(perfect["direct_route_continuity"], 1.0)
+            self.assertEqual(perfect["continuity_pairs"], 2)
             comparison = compare(train, train_truth, test, test_truth, n_splits=2, jobs=1)
             cv, summary, model, _, _ = comparison
             self.assertEqual(len(summary), 6)
