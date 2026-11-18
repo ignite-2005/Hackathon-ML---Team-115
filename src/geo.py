@@ -1,35 +1,40 @@
 """Shared geometry helpers. Every team member imports from here so metres match.
 
-The trips are spread across the world, so one fixed projection doesn't work.
-Each trip is projected to the UTM zone that contains it (chosen from the median
-GPS position). Within one trip, ALWAYS use the same epsg for GPS and road nodes.
+The trips are spread across the world (Russia, USA, Japan, Brazil, ...), so there is
+no single national grid that works for all of them. Each trip gets its own local
+azimuthal-equidistant projection centred on the middle of its road network, which
+keeps distances accurate (well under 1% error) within the trip's area.
+Always use the same origin for the track and the nodes of one trip: trip_origin(d).
 """
 from functools import lru_cache
 import numpy as np
 from pyproj import Transformer
 
 
-def utm_epsg(lon, lat):
-    """EPSG code of the UTM zone containing (lon, lat). 326xx north, 327xx south."""
-    zone = int((lon + 180) // 6) + 1
-    zone = min(max(zone, 1), 60)
-    return (32600 if lat >= 0 else 32700) + zone
+def trip_origin(d):
+    """Projection centre for a trip: mean lon/lat of its road-network nodes.
+
+    Uses only the nodes, so it is available for evaluator trips at inference time.
+    """
+    return (round(float(d["nodes"]["lon"].mean()), 6),
+            round(float(d["nodes"]["lat"].mean()), 6))
 
 
-def trip_epsg(d):
-    """UTM EPSG code for one trip, from the median GPS position."""
-    return utm_epsg(float(d["track"]["lon"].median()), float(d["track"]["lat"].median()))
+@lru_cache(maxsize=256)
+def _transformer(lon0, lat0):
+    return Transformer.from_crs(
+        "EPSG:4326",
+        f"+proj=aeqd +lat_0={lat0} +lon_0={lon0} +datum=WGS84 +units=m",
+        always_xy=True)
 
 
-@lru_cache(maxsize=None)
-def _transformer(epsg):
-    return Transformer.from_crs("EPSG:4326", f"EPSG:{epsg}", always_xy=True)
+def to_metres(lon, lat, origin):
+    """lon/lat arrays (degrees) -> x/y arrays (metres) in the trip's local projection.
 
-
-def to_metres(lon, lat, epsg):
-    """lon/lat arrays (degrees) -> x/y arrays (metres) in the given UTM zone."""
-    x, y = _transformer(epsg).transform(np.asarray(lon, dtype=float),
-                                        np.asarray(lat, dtype=float))
+    origin = trip_origin(d) for the trip these coordinates belong to.
+    """
+    x, y = _transformer(*origin).transform(np.asarray(lon, dtype=float),
+                                           np.asarray(lat, dtype=float))
     return np.asarray(x), np.asarray(y)
 
 

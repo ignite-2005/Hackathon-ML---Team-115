@@ -14,15 +14,15 @@ import folium
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from load_data import load_trip
-from geo import to_metres, trip_epsg
+from geo import to_metres, trip_origin
 
 
 def trip_stats(d, partition):
     tr, nodes, arcs, route = d["track"], d["nodes"], d["arcs"], d["route"]
-    epsg = trip_epsg(d)
+    origin = trip_origin(d)
 
     # GPS movement in metres
-    x, y = to_metres(tr["lon"], tr["lat"], epsg)
+    x, y = to_metres(tr["lon"], tr["lat"], origin)
     step_m = np.hypot(np.diff(x), np.diff(y))
     dt = np.diff(tr["t"].values)
     speed = np.where(dt > 0, step_m / np.where(dt > 0, dt, 1), np.nan)
@@ -45,7 +45,7 @@ def trip_stats(d, partition):
     return {
         "partition": partition,
         "trip_id": d["trip_id"],
-        "utm_epsg": epsg,
+        "proj_origin": origin,
         "n_gps": len(tr),
         "gps_length_km": round(step_m.sum() / 1000, 2),
         "median_speed_ms": round(np.nanmedian(speed), 2),
@@ -79,9 +79,9 @@ def plot_hist(values, title, xlabel, path, bins=50, log=True):
 def plot_trip(d, path):
     """GPS points vs reference route in metres for one trip."""
     tr, nodes, arcs, route = d["track"], d["nodes"], d["arcs"], d["route"]
-    epsg = trip_epsg(d)
-    nx_, ny_ = to_metres(nodes["lon"], nodes["lat"], epsg)
-    gx, gy = to_metres(tr["lon"], tr["lat"], epsg)
+    origin = trip_origin(d)
+    nx_, ny_ = to_metres(nodes["lon"], nodes["lat"], origin)
+    gx, gy = to_metres(tr["lon"], tr["lat"], origin)
     plt.figure(figsize=(7, 7))
     # Only the road arcs near the trip, so the plot stays readable
     pad = 300
@@ -96,7 +96,7 @@ def plot_trip(d, path):
                  label="reference route" if k == 0 else None)
     plt.scatter(gx, gy, s=3, color="blue", label="GPS points")
     plt.gca().set_aspect("equal")
-    plt.title(f"Trip {d['trip_id']} (EPSG:{trip_epsg(d)}, metres)")
+    plt.title(f"Trip {d['trip_id']} (local metres)")
     plt.legend()
     plt.tight_layout()
     plt.savefig(path, dpi=130)
