@@ -1,0 +1,167 @@
+  train 00000001: 1.8s
+  train 00000002: 1.5s
+  train 00000003: 0.4s
+  train 00000004: 0.4s
+  train 00000005: 0.2s
+  train 00000006: 0.4s
+  train 00000008: 0.7s
+  train 00000010: 0.8s
+  train 00000011: 0.5s
+  train 00000012: 0.2s
+  train 00000013: 3.1s
+  train 00000014: 0.2s
+  train 00000016: 0.4s
+  train 00000018: 0.2s
+  train 00000019: 1.2s
+  train 00000020: 0.3s
+  train 00000021: 2.0s
+  train 00000022: 0.4s
+  train 00000024: 0.5s
+  train 00000025: 0.7s
+  train 00000026: 0.2s
+  train 00000027: 0.2s
+  train 00000028: 1.6s
+  train 00000029: 0.3s
+  train 00000031: 1.5s
+  train 00000032: 2.1s
+  train 00000034: 0.9s
+  train 00000035: 0.6s
+  train 00000036: 0.3s
+  train 00000037: 0.3s
+  train 00000038: 0.5s
+  train 00000039: 0.1s
+  train 00000041: 0.4s
+  train 00000042: 2.3s
+  train 00000043: 1.6s
+  train 00000044: 0.2s
+  train 00000045: 0.2s
+  train 00000046: 0.2s
+  train 00000047: 0.4s
+  train 00000048: 0.3s
+  train 00000050: 0.1s
+  train 00000051: 0.3s
+  train 00000053: 0.6s
+  train 00000055: 0.8s
+  train 00000057: 0.2s
+  train 00000058: 0.4s
+  train 00000060: 0.9s
+  train 00000061: 0.4s
+  train 00000062: 1.0s
+  train 00000063: 0.6s
+  train 00000064: 0.8s
+  train 00000066: 0.9s
+  train 00000068: 0.3s
+  train 00000069: 0.8s
+  train 00000070: 0.4s
+  train 00000071: 0.3s
+  train 00000072: 0.2s
+  train 00000074: 0.9s
+  train 00000075: 0.4s
+  train 00000078: 2.1s
+  train 00000079: 0.5s
+  train 00000080: 0.6s
+  train 00000081: 1.0s
+  train 00000082: 1.2s
+  train 00000083: 0.4s
+  train 00000084: 3.0s
+  train 00000085: 0.2s
+  train 00000086: 2.1s
+  train 00000088: 0.6s
+  train 00000089: 0.7s
+  train 00000090: 0.3s
+  train 00000092: 3.1s
+  train 00000093: 0.8s
+  train 00000095: 0.4s
+  train 00000096: 0.9s
+  train 00000097: 0.7s
+  train 00000098: 2.0s
+  train 00000099: 0.7s
+classifier beta   1.0 w  0.25 gap 60: Top-1 89.04  F1 92.24  (3s)
+classifier beta   1.0 w  0.50 gap 60: Top-1 90.30  F1 92.57  (5s)
+classifier beta   1.0 w  1.00 gap 60: Top-1 91.52  F1 92.88  (3s)
+classifier beta   1.0 w  2.00 gap 60: Top-1 92.48  F1 93.11  (5s)
+classifier beta   1.0 w  4.00 gap 60: Top-1 92.41  F1 93.01  (4s)
+classifier beta   1.0 w  8.00 gap 60: Top-1 91.72  F1 92.79  (4s)
+classifier beta   1.7 w  0.25 gap 60: Top-1 90.01  F1 92.51  (5s)
+classifier beta   1.7 w  0.50 gap 60: Top-1 91.39  F1 92.82  (3s)
+classifier beta   1.7 w  1.00 gap 60: Top-1 92.35  F1 93.10  (5s)
+classifier beta   1.7 w  2.00 gap 60: Top-1 92.38  F1 93.02  (3s)
+classifier beta   1.7 w  4.00 gap 60: Top-1 91.90  F1 92.84  (6s)
+classifier beta   1.7 w  8.00 gap 60: Top-1 91.20  F1 92.38  (4s)
+classifier beta   3.0 w  0.25 gap 60: Top-1 91.23  F1 92.78  (5s)
+classifier beta   3.0 w  0.50 gap 60: Top-1 92.30  F1 93.07  (5s)
+classifier beta   3.0 w  1.00 gap 60: Top-1 92.36  F1 93.03  (3s)
+classifier beta   3.0 w  2.00 gap 60: Top-1 91.95  F1 92.90  (5s)
+classifier beta   3.0 w  4.00 gap 60: Top-1 91.37  F1 92.49  (4s)
+classifier beta   3.0 w  8.00 gap 60: Top-1 90.57  F1 91.79  (5s)
+classifier beta   5.0 w  0.25 gap 60: Top-1 92.10  F1 92.94  (5s)
+classifier beta   5.0 w  0.50 gap 60: Top-1 92.57  F1 93.07  (3s)
+classifier beta   5.0 w  1.00 gap 60: Top-1 92.07  F1 92.95  (4s)
+classifier beta   5.0 w  2.00 gap 60: Top-1 91.53  F1 92.59  (4s)
+classifier beta   5.0 w  4.00 gap 60: Top-1 90.80  F1 92.00  (5s)
+classifier beta   5.0 w  8.00 gap 60: Top-1 89.89  F1 91.17  (5s)
+classifier beta  10.0 w  0.25 gap 60: Top-1 92.57  F1 93.07  (4s)
+classifier beta  10.0 w  0.50 gap 60: Top-1 92.07  F1 92.95  (6s)
+classifier beta  10.0 w  1.00 gap 60: Top-1 91.53  F1 92.59  (4s)
+classifier beta  10.0 w  2.00 gap 60: Top-1 90.80  F1 92.00  (6s)
+classifier beta  10.0 w  4.00 gap 60: Top-1 89.89  F1 91.17  (4s)
+classifier beta  10.0 w  8.00 gap 60: Top-1 88.95  F1 90.30  (6s)
+classifier beta  20.0 w  0.25 gap 60: Top-1 92.07  F1 92.95  (3s)
+classifier beta  20.0 w  0.50 gap 60: Top-1 91.53  F1 92.59  (5s)
+classifier beta  20.0 w  1.00 gap 60: Top-1 90.80  F1 92.00  (4s)
+classifier beta  20.0 w  2.00 gap 60: Top-1 89.89  F1 91.17  (3s)
+classifier beta  20.0 w  4.00 gap 60: Top-1 88.95  F1 90.30  (2s)
+classifier beta  20.0 w  8.00 gap 60: Top-1 88.28  F1 89.57  (2s)
+classifier beta  50.0 w  0.25 gap 60: Top-1 91.32  F1 92.46  (2s)
+classifier beta  50.0 w  0.50 gap 60: Top-1 90.54  F1 91.75  (2s)
+classifier beta  50.0 w  1.00 gap 60: Top-1 89.61  F1 90.87  (2s)
+classifier beta  50.0 w  2.00 gap 60: Top-1 88.72  F1 90.09  (2s)
+classifier beta  50.0 w  4.00 gap 60: Top-1 88.01  F1 89.34  (2s)
+classifier beta  50.0 w  8.00 gap 60: Top-1 87.38  F1 88.79  (2s)
+classifier beta   5.0 w  0.50 gap    15: Top-1 92.45  F1 92.96
+classifier beta   5.0 w  0.50 gap    30: Top-1 92.53  F1 93.05
+classifier beta   5.0 w  0.50 gap   120: Top-1 92.75  F1 93.08
+gaussian   beta   1.0 w  0.25 gap 60: Top-1 88.65  F1 92.10  (2s)
+gaussian   beta   1.0 w  0.50 gap 60: Top-1 89.49  F1 92.35  (2s)
+gaussian   beta   1.0 w  1.00 gap 60: Top-1 90.24  F1 92.54  (2s)
+gaussian   beta   1.0 w  2.00 gap 60: Top-1 91.26  F1 92.75  (2s)
+gaussian   beta   1.0 w  4.00 gap 60: Top-1 91.72  F1 92.85  (2s)
+gaussian   beta   1.7 w  0.25 gap 60: Top-1 89.33  F1 92.32  (2s)
+gaussian   beta   1.7 w  0.50 gap 60: Top-1 90.08  F1 92.54  (2s)
+gaussian   beta   1.7 w  1.00 gap 60: Top-1 90.83  F1 92.72  (2s)
+gaussian   beta   1.7 w  2.00 gap 60: Top-1 91.63  F1 92.84  (2s)
+gaussian   beta   1.7 w  4.00 gap 60: Top-1 92.08  F1 92.81  (2s)
+gaussian   beta   3.0 w  0.25 gap 60: Top-1 89.89  F1 92.49  (2s)
+gaussian   beta   3.0 w  0.50 gap 60: Top-1 90.71  F1 92.67  (2s)
+gaussian   beta   3.0 w  1.00 gap 60: Top-1 91.60  F1 92.86  (2s)
+gaussian   beta   3.0 w  2.00 gap 60: Top-1 91.95  F1 92.84  (3s)
+gaussian   beta   3.0 w  4.00 gap 60: Top-1 92.24  F1 92.55  (3s)
+gaussian   beta   5.0 w  0.25 gap 60: Top-1 90.46  F1 92.60  (3s)
+gaussian   beta   5.0 w  0.50 gap 60: Top-1 91.41  F1 92.81  (4s)
+gaussian   beta   5.0 w  1.00 gap 60: Top-1 91.85  F1 92.85  (3s)
+gaussian   beta   5.0 w  2.00 gap 60: Top-1 92.20  F1 92.66  (3s)
+gaussian   beta   5.0 w  4.00 gap 60: Top-1 92.32  F1 92.12  (3s)
+gaussian   beta  10.0 w  0.25 gap 60: Top-1 91.41  F1 92.81  (4s)
+gaussian   beta  10.0 w  0.50 gap 60: Top-1 91.85  F1 92.85  (3s)
+gaussian   beta  10.0 w  1.00 gap 60: Top-1 92.20  F1 92.66  (3s)
+gaussian   beta  10.0 w  2.00 gap 60: Top-1 92.32  F1 92.12  (3s)
+gaussian   beta  10.0 w  4.00 gap 60: Top-1 92.18  F1 91.41  (3s)
+gaussian   beta  20.0 w  0.25 gap 60: Top-1 91.85  F1 92.85  (3s)
+gaussian   beta  20.0 w  0.50 gap 60: Top-1 92.20  F1 92.66  (3s)
+gaussian   beta  20.0 w  1.00 gap 60: Top-1 92.32  F1 92.12  (2s)
+gaussian   beta  20.0 w  2.00 gap 60: Top-1 92.18  F1 91.41  (3s)
+gaussian   beta  20.0 w  4.00 gap 60: Top-1 92.02  F1 90.39  (3s)
+gaussian   beta  50.0 w  0.25 gap 60: Top-1 92.24  F1 92.53  (3s)
+gaussian   beta  50.0 w  0.50 gap 60: Top-1 92.30  F1 91.92  (3s)
+gaussian   beta  50.0 w  1.00 gap 60: Top-1 92.08  F1 91.09  (3s)
+gaussian   beta  50.0 w  2.00 gap 60: Top-1 91.93  F1 90.10  (3s)
+gaussian   beta  50.0 w  4.00 gap 60: Top-1 91.48  F1 89.10  (4s)
+gaussian   beta   5.0 w  4.00 gap    15: Top-1 92.18  F1 92.02
+gaussian   beta   5.0 w  4.00 gap    30: Top-1 92.26  F1 92.11
+gaussian   beta   5.0 w  4.00 gap   120: Top-1 92.40  F1 92.12
+
+best per emission (train, OOF probabilities, trips 33/54 excluded):
+  emission  beta   w  gap_s  top1  continuity  precision  recall    f1
+classifier   5.0 0.5  120.0 92.75       90.63      96.39   89.99 93.08
+  gaussian   5.0 4.0  120.0 92.40       89.91      94.49   89.87 92.12
+saved outputs\hmm/decoder_tuning_train_untuned.csv, decoder_best_untuned.json

@@ -38,7 +38,7 @@ from metrics import route_from_points, continuity, route_prf
 
 
 def viterbi(states, log_e, g, beta, w=1.0, gap_s=60.0, sp=None, break_before=None,
-            trans_kw=None):
+            trans_kw=None, precomputed=None):
     """Best candidate index per point (-1 = unmatched) + counts of why chains broke.
 
     states = build_states(...), log_e = one emission array per point (step 3),
@@ -47,6 +47,8 @@ def viterbi(states, log_e, g, beta, w=1.0, gap_s=60.0, sp=None, break_before=Non
     at that point for that reason. When given, it replaces the dt > gap_s check (used
     when some points were skipped, so the dt between kept points is not the real gap).
     trans_kw (optional): neg_tol / max_speed / slack for log_transitions (from hmm_config.json).
+    precomputed (optional, for tuning): {t: |d_route - d_gc| matrix for the step t-1 -> t}.
+    log_t is then just -matrix / beta, so trying many beta / w values needs no new Dijkstra.
     """
     n = states["n_points"]
     sp = sp or ShortestPaths(g["graph"])
@@ -84,11 +86,14 @@ def viterbi(states, log_e, g, beta, w=1.0, gap_s=60.0, sp=None, break_before=Non
             if reason:
                 breaks[reason] += 1
             else:
-                d_gc = np.hypot(states["x"][t] - states["x"][prev],
-                                states["y"][t] - states["y"][prev])
-                lt = log_transitions(g, sp, states["arcs"][prev], states["offset"][prev],
-                                     states["arcs"][t], states["offset"][t], d_gc, dt, beta,
-                                     **(trans_kw or {}))
+                if precomputed is not None and prev == t - 1:
+                    lt = -precomputed[t] / beta
+                else:
+                    d_gc = np.hypot(states["x"][t] - states["x"][prev],
+                                    states["y"][t] - states["y"][prev])
+                    lt = log_transitions(g, sp, states["arcs"][prev], states["offset"][prev],
+                                         states["arcs"][t], states["offset"][t], d_gc, dt, beta,
+                                         **(trans_kw or {}))
                 scores = delta[:, None] + lt           # [i, j]: come from i, go to j
                 back = np.argmax(scores, axis=0)       # best i for every j
                 best = scores[back, np.arange(len(back))]
