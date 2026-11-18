@@ -1,9 +1,9 @@
 """PathSnap inference pipeline used by the API (Person D).
 
 predict(folder)   : track + road network -> arc per GPS point and the driven route.
-                    Uses Person B's classifier (results/person_b_final/best_model.joblib) as
-                    HMM emissions and Person C's Viterbi decoder (hmm/decode.py).
-                    It never opens the .route file.
+                    Runs Person C's decoder (hmm/decode.py) with the model named in
+                    hmm/hmm_config.json (the Optuna-tuned Random forest, models/rf_tuned.joblib)
+                    as HMM emissions. It never opens the .route file.
 evaluate(folder,p): server-side scoring against the trip's reference .route. The results
                     are only numbers. The reference route itself is never returned to the UI.
 """
@@ -11,7 +11,6 @@ import os
 import sys
 import time
 
-import joblib
 import numpy as np
 import pandas as pd
 
@@ -20,25 +19,25 @@ for p in (REPO, os.path.join(REPO, "src"), os.path.join(REPO, "hmm")):
     if p not in sys.path:
         sys.path.insert(0, p)
 
-from decode import decode_trip, load_config, load_trip_no_labels   # noqa: E402  (hmm/)
+from decode import (decode_trip, load_config, load_model, load_trip_no_labels,  # noqa: E402
+                    classifier_proba)                                             # (hmm/)
 from metrics import route_from_points, continuity, route_prf, prf   # noqa: E402  (hmm/)
 from load_data import load_trip                                    # noqa: E402  (src/)
-from candidates import align_route                                 # noqa: E402  (src/)
-from src.candidate_features import FEATURE_COLUMNS, build_features  # noqa: E402
+from candidates import align_route, generate_candidates            # noqa: E402  (src/)
 
-MODEL_PATH = os.environ.get(
-    "PATHSNAP_MODEL", os.path.join(REPO, "results", "person_b_final", "best_model.joblib"))
+# Optional override, e.g. PATHSNAP_MODEL=results/person_b_final/best_model.joblib (untuned)
+MODEL_OVERRIDE = os.environ.get("PATHSNAP_MODEL")
 
 
 class Pipeline:
     """Loads the model and HMM config once, then decodes any number of trips."""
 
-    def __init__(self, model_path=MODEL_PATH):
-        self.bundle = joblib.load(model_path)
-        self.model = self.bundle["estimator"]
+    def __init__(self, model_path=MODEL_OVERRIDE):
+        self.config = load_config()
+        self.model_path = model_path or self.config["model_path"]
+        self.bundle = load_model(self.model_path)
         self.model_name = self.bundle["model_name"]
         self.feature_options = self.bundle["feature_options"]
-        self.config = load_config()
         # the classifier and the decoder must search candidates the same way
         for key in ("radius_m", "max_k"):
             if self.feature_options[key] != self.config[key]:
@@ -46,31 +45,17 @@ class Pipeline:
 
     def predict(self, folder):
         """Decode one trip folder. Reads only .track, .nodes and .arcs."""
-        cache = {}
-
-        def make_features(d, cands):
-            rows = build_features(d, cands,
-                                  max_heading_gap_s=self.feature_options["max_heading_gap_s"])
-            # decode_trip pairs probabilities with candidate rows by position, so the
-            # feature rows must be in exactly the same order as the candidate rows
-            if not (np.array_equal(rows["obs_idx"].to_numpy(), cands["obs_idx"].to_numpy())
-                    and np.array_equal(rows["arc_id"].to_numpy(), cands["arc_id"].to_numpy())):
-                raise RuntimeError("feature rows are not aligned with candidate rows")
-            cache["rows"] = rows
-            return rows[FEATURE_COLUMNS].astype(np.float32)
-
         t0 = time.perf_counter()
-        out = decode_trip(folder, self.model, make_features, self.config)
+        out = decode_trip(folder, self.bundle, self.config)
         out["stats"]["pipeline_secs"] = round(time.perf_counter() - t0, 2)
 
-        # Classifier-only prediction (no HMM): the highest-probability candidate per point.
-        n = len(out["point_arcs"])
-        clf = np.full(n, -1, dtype=int)
-        rows = cache.get("rows")
-        if rows is not None and len(rows):
-            positive = int(np.flatnonzero(self.model.classes_ == 1)[0])
-            proba = self.model.predict_proba(rows[FEATURE_COLUMNS].astype(np.float32))[:, positive]
-            r = rows[["obs_idx", "arc_id"]].assign(p=proba).reset_index(drop=True)
+        # Classifier-only prediction (no HMM): the highest-probability candidate per point,
+        # with the same candidates and the same model as the decoder.
+        d = load_trip_no_labels(folder)
+        cands = generate_candidates(d, self.config["radius_m"], self.config["max_k"])
+        clf = np.full(len(d["track"]), -1, dtype=int)
+        if len(cands):
+            r = cands[["obs_idx", "arc_id"]].assign(p=classifier_proba(d, cands, self.bundle))
             best = r.loc[r.groupby("obs_idx", sort=False)["p"].idxmax()]   # ties -> nearest
             clf[best["obs_idx"].to_numpy()] = best["arc_id"].to_numpy()
         out["classifier_point_arcs"] = clf.tolist()

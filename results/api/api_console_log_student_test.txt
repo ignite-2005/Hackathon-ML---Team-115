@@ -1,113 +1,112 @@
-16:17:47 | INFO | Loading model and HMM config ...
-16:17:50 | INFO | Model: Random forest | features: {'radius_m': 50.0, 'max_k': 16, 'max_heading_gap_s': 5.0}
-16:17:50 | INFO | Trips folder: C:\ML hackathon\Student folder\Student folder\student_test (10 trips)
-16:17:57 | INFO | GET /health from 127.0.0.1 -> 200 (7 ms)
-16:18:14 | INFO | GET /health from 127.0.0.1 -> 200 (3 ms)
-16:18:16 | INFO | GET /trips from 127.0.0.1 -> 200 (4 ms)
-16:18:20 | INFO | === Trip 00000000: running pipeline (candidates -> features -> Random forest -> Viterbi)
-16:18:22 | INFO | Trip 00000000: 2503 GPS points -> 184 route arcs, 0 unmatched, 1.46 s
-16:18:22 | INFO | Trip 00000000: Top-1 accuracy  HMM 97.00% | classifier-only 93.33%
-16:18:22 | INFO | Trip 00000000: route F1 94.77% | precision 93.48% | recall 96.09% | continuity 95.63%
-16:18:22 | INFO | POST /predict from 127.0.0.1 -> 200 (1722 ms)
-16:18:31 | INFO | === Trip 00000000: running pipeline (candidates -> features -> Random forest -> Viterbi)
-16:18:32 | INFO | Trip 00000000: 2503 GPS points -> 184 route arcs, 0 unmatched, 0.75 s
-16:18:32 | INFO | Trip 00000000: Top-1 accuracy  HMM 97.00% | classifier-only 93.33%
-16:18:32 | INFO | Trip 00000000: route F1 94.77% | precision 93.48% | recall 96.09% | continuity 95.63%
-16:18:32 | INFO | POST /predict from 127.0.0.1 -> 200 (964 ms)
-16:18:34 | INFO | === Trip 00000007: running pipeline (candidates -> features -> Random forest -> Viterbi)
-16:18:35 | INFO | Trip 00000007: 1354 GPS points -> 121 route arcs, 0 unmatched, 0.38 s
-16:18:35 | INFO | Trip 00000007: Top-1 accuracy  HMM 100.00% | classifier-only 93.13%
-16:18:35 | INFO | Trip 00000007: route F1 99.18% | precision 100.00% | recall 98.37% | continuity 100.00%
-16:18:35 | INFO | POST /predict from 127.0.0.1 -> 200 (490 ms)
-16:18:37 | INFO | === Trip 00000009: running pipeline (candidates -> features -> Random forest -> Viterbi)
-16:18:37 | INFO | Trip 00000009: 1049 GPS points -> 389 route arcs, 0 unmatched, 0.50 s
-16:18:37 | INFO | Trip 00000009: Top-1 accuracy  HMM 90.56% | classifier-only 85.89%
-16:18:37 | INFO | Trip 00000009: route F1 89.00% | precision 93.57% | recall 84.85% | continuity 85.05%
-16:18:37 | INFO | POST /predict from 127.0.0.1 -> 200 (660 ms)
-16:18:40 | INFO | === Trip 00000040: running pipeline (candidates -> features -> Random forest -> Viterbi)
-16:18:40 | INFO | Trip 00000040: 2995 GPS points -> 310 route arcs, 0 unmatched, 0.79 s
-16:18:41 | INFO | Trip 00000040: Top-1 accuracy  HMM 94.52% | classifier-only 91.89%
-16:18:41 | INFO | Trip 00000040: route F1 97.39% | precision 98.35% | recall 96.44% | continuity 96.12%
-16:18:41 | INFO | POST /predict from 127.0.0.1 -> 200 (1049 ms)
-16:18:43 | INFO | === Trip 00000052: running pipeline (candidates -> features -> Random forest -> Viterbi)
-16:18:43 | INFO | Trip 00000052: 262 GPS points -> 83 route arcs, 0 unmatched, 0.28 s
-16:18:43 | INFO | Trip 00000052: Top-1 accuracy  HMM 100.00% | classifier-only 95.04%
-16:18:43 | INFO | Trip 00000052: route F1 93.26% | precision 100.00% | recall 87.37% | continuity 89.02%
-16:18:43 | INFO | POST /predict from 127.0.0.1 -> 200 (327 ms)
-16:18:45 | INFO | === Trip 00000056: running pipeline (candidates -> features -> Random forest -> Viterbi)
-16:18:46 | INFO | Trip 00000056: 3958 GPS points -> 1191 route arcs, 0 unmatched, 1.32 s
-16:18:47 | INFO | Trip 00000056: Top-1 accuracy  HMM 95.40% | classifier-only 88.61%
-16:18:47 | INFO | Trip 00000056: route F1 93.76% | precision 97.76% | recall 90.07% | continuity 89.08%
-16:18:47 | INFO | POST /predict from 127.0.0.1 -> 200 (1857 ms)
-16:18:49 | INFO | === Trip 00000065: running pipeline (candidates -> features -> Random forest -> Viterbi)
-16:18:49 | INFO | Trip 00000065: 768 GPS points -> 136 route arcs, 0 unmatched, 0.55 s
-16:18:50 | INFO | Trip 00000065: Top-1 accuracy  HMM 92.32% | classifier-only 85.03%
-16:18:50 | INFO | Trip 00000065: route F1 95.37% | precision 98.53% | recall 92.41% | continuity 92.59%
-16:18:50 | INFO | POST /predict from 127.0.0.1 -> 200 (660 ms)
-16:18:52 | INFO | === Trip 00000076: running pipeline (candidates -> features -> Random forest -> Viterbi)
-16:18:53 | INFO | Trip 00000076: 1486 GPS points -> 356 route arcs, 0 unmatched, 1.17 s
-16:18:53 | INFO | Trip 00000076: Top-1 accuracy  HMM 95.63% | classifier-only 84.93%
-16:18:53 | INFO | Trip 00000076: route F1 89.86% | precision 92.13% | recall 87.70% | continuity 87.32%
-16:18:53 | INFO | POST /predict from 127.0.0.1 -> 200 (1380 ms)
-16:18:55 | INFO | === Trip 00000077: running pipeline (candidates -> features -> Random forest -> Viterbi)
-16:18:56 | INFO | Trip 00000077: 3911 GPS points -> 310 route arcs, 0 unmatched, 1.22 s
-16:18:56 | INFO | Trip 00000077: Top-1 accuracy  HMM 83.74% | classifier-only 69.29%
-16:18:56 | INFO | Trip 00000077: route F1 95.22% | precision 93.84% | recall 96.64% | continuity 93.85%
-16:18:57 | INFO | POST /predict from 127.0.0.1 -> 200 (1519 ms)
-16:18:59 | INFO | === Trip 00000091: running pipeline (candidates -> features -> Random forest -> Viterbi)
-16:18:59 | INFO | Trip 00000091: 874 GPS points -> 188 route arcs, 0 unmatched, 0.50 s
-16:18:59 | INFO | Trip 00000091: Top-1 accuracy  HMM 93.02% | classifier-only 85.13%
-16:18:59 | INFO | Trip 00000091: route F1 86.67% | precision 96.81% | recall 78.45% | continuity 83.42%
-16:18:59 | INFO | POST /predict from 127.0.0.1 -> 200 (619 ms)
-16:19:13 | INFO | GET /health from 127.0.0.1 -> 200 (5 ms)
-16:19:15 | INFO | GET /trips from 127.0.0.1 -> 200 (2 ms)
-16:19:18 | INFO | === Trip 00000000: running pipeline (candidates -> features -> Random forest -> Viterbi)
-16:19:19 | INFO | Trip 00000000: 2503 GPS points -> 184 route arcs, 0 unmatched, 0.72 s
-16:19:19 | INFO | Trip 00000000: Top-1 accuracy  HMM 97.00% | classifier-only 93.33%
-16:19:19 | INFO | Trip 00000000: route F1 94.77% | precision 93.48% | recall 96.09% | continuity 95.63%
-16:19:19 | INFO | POST /predict from 127.0.0.1 -> 200 (1037 ms)
-16:19:21 | INFO | === Trip 00000007: running pipeline (candidates -> features -> Random forest -> Viterbi)
-16:19:22 | INFO | Trip 00000007: 1354 GPS points -> 121 route arcs, 0 unmatched, 0.42 s
-16:19:22 | INFO | Trip 00000007: Top-1 accuracy  HMM 100.00% | classifier-only 93.13%
-16:19:22 | INFO | Trip 00000007: route F1 99.18% | precision 100.00% | recall 98.37% | continuity 100.00%
-16:19:22 | INFO | POST /predict from 127.0.0.1 -> 200 (586 ms)
-16:19:24 | INFO | === Trip 00000009: running pipeline (candidates -> features -> Random forest -> Viterbi)
-16:19:24 | INFO | Trip 00000009: 1049 GPS points -> 389 route arcs, 0 unmatched, 0.55 s
-16:19:24 | INFO | Trip 00000009: Top-1 accuracy  HMM 90.56% | classifier-only 85.89%
-16:19:24 | INFO | Trip 00000009: route F1 89.00% | precision 93.57% | recall 84.85% | continuity 85.05%
-16:19:24 | INFO | POST /predict from 127.0.0.1 -> 200 (662 ms)
-16:19:26 | INFO | === Trip 00000040: running pipeline (candidates -> features -> Random forest -> Viterbi)
-16:19:27 | INFO | Trip 00000040: 2995 GPS points -> 310 route arcs, 0 unmatched, 0.75 s
-16:19:27 | INFO | Trip 00000040: Top-1 accuracy  HMM 94.52% | classifier-only 91.89%
-16:19:27 | INFO | Trip 00000040: route F1 97.39% | precision 98.35% | recall 96.44% | continuity 96.12%
-16:19:27 | INFO | POST /predict from 127.0.0.1 -> 200 (1025 ms)
-16:19:29 | INFO | === Trip 00000052: running pipeline (candidates -> features -> Random forest -> Viterbi)
-16:19:30 | INFO | Trip 00000052: 262 GPS points -> 83 route arcs, 0 unmatched, 0.24 s
-16:19:30 | INFO | Trip 00000052: Top-1 accuracy  HMM 100.00% | classifier-only 95.04%
-16:19:30 | INFO | Trip 00000052: route F1 93.26% | precision 100.00% | recall 87.37% | continuity 89.02%
-16:19:30 | INFO | POST /predict from 127.0.0.1 -> 200 (304 ms)
-16:19:32 | INFO | === Trip 00000056: running pipeline (candidates -> features -> Random forest -> Viterbi)
-16:19:33 | INFO | Trip 00000056: 3958 GPS points -> 1191 route arcs, 0 unmatched, 1.42 s
-16:19:34 | INFO | Trip 00000056: Top-1 accuracy  HMM 95.40% | classifier-only 88.61%
-16:19:34 | INFO | Trip 00000056: route F1 93.76% | precision 97.76% | recall 90.07% | continuity 89.08%
-16:19:34 | INFO | POST /predict from 127.0.0.1 -> 200 (1937 ms)
-16:19:36 | INFO | === Trip 00000065: running pipeline (candidates -> features -> Random forest -> Viterbi)
-16:19:36 | INFO | Trip 00000065: 768 GPS points -> 136 route arcs, 0 unmatched, 0.48 s
-16:19:36 | INFO | Trip 00000065: Top-1 accuracy  HMM 92.32% | classifier-only 85.03%
-16:19:36 | INFO | Trip 00000065: route F1 95.37% | precision 98.53% | recall 92.41% | continuity 92.59%
-16:19:36 | INFO | POST /predict from 127.0.0.1 -> 200 (594 ms)
-16:19:38 | INFO | === Trip 00000076: running pipeline (candidates -> features -> Random forest -> Viterbi)
-16:19:40 | INFO | Trip 00000076: 1486 GPS points -> 356 route arcs, 0 unmatched, 1.19 s
-16:19:40 | INFO | Trip 00000076: Top-1 accuracy  HMM 95.63% | classifier-only 84.93%
-16:19:40 | INFO | Trip 00000076: route F1 89.86% | precision 92.13% | recall 87.70% | continuity 87.32%
-16:19:40 | INFO | POST /predict from 127.0.0.1 -> 200 (1418 ms)
-16:19:42 | INFO | === Trip 00000077: running pipeline (candidates -> features -> Random forest -> Viterbi)
-16:19:43 | INFO | Trip 00000077: 3911 GPS points -> 310 route arcs, 0 unmatched, 1.19 s
-16:19:43 | INFO | Trip 00000077: Top-1 accuracy  HMM 83.74% | classifier-only 69.29%
-16:19:43 | INFO | Trip 00000077: route F1 95.22% | precision 93.84% | recall 96.64% | continuity 93.85%
-16:19:43 | INFO | POST /predict from 127.0.0.1 -> 200 (1507 ms)
-16:19:45 | INFO | === Trip 00000091: running pipeline (candidates -> features -> Random forest -> Viterbi)
-16:19:46 | INFO | Trip 00000091: 874 GPS points -> 188 route arcs, 0 unmatched, 0.50 s
-16:19:46 | INFO | Trip 00000091: Top-1 accuracy  HMM 93.02% | classifier-only 85.13%
-16:19:46 | INFO | Trip 00000091: route F1 86.67% | precision 96.81% | recall 78.45% | continuity 83.42%
-16:19:46 | INFO | POST /predict from 127.0.0.1 -> 200 (591 ms)
+16:29:14 | INFO | Loading model and HMM config ...
+16:29:15 | INFO | Model: Random forest (tuned) | features: {'radius_m': 50.0, 'max_k': 16, 'max_heading_gap_s': 5.0}
+16:29:15 | INFO | Trips folder: C:\ML hackathon\Student folder\Student folder\student_test (10 trips)
+16:29:28 | INFO | GET /health from 127.0.0.1 -> 200 (7 ms)
+16:29:30 | INFO | GET /trips from 127.0.0.1 -> 200 (3 ms)
+16:29:33 | INFO | === Trip 00000000: running pipeline (candidates -> features -> Random forest (tuned) -> Viterbi)
+16:29:34 | INFO | Trip 00000000: 2503 GPS points -> 187 route arcs, 0 unmatched, 1.08 s
+16:29:35 | INFO | Trip 00000000: Top-1 accuracy  HMM 96.68% | classifier-only 93.85%
+16:29:35 | INFO | Trip 00000000: route F1 94.77% | precision 93.48% | recall 96.09% | continuity 94.62%
+16:29:35 | INFO | POST /predict from 127.0.0.1 -> 200 (1329 ms)
+16:29:45 | INFO | === Trip 00000000: running pipeline (candidates -> features -> Random forest (tuned) -> Viterbi)
+16:29:46 | INFO | Trip 00000000: 2503 GPS points -> 187 route arcs, 0 unmatched, 0.80 s
+16:29:46 | INFO | Trip 00000000: Top-1 accuracy  HMM 96.68% | classifier-only 93.85%
+16:29:46 | INFO | Trip 00000000: route F1 94.77% | precision 93.48% | recall 96.09% | continuity 94.62%
+16:29:46 | INFO | POST /predict from 127.0.0.1 -> 200 (1003 ms)
+16:29:48 | INFO | === Trip 00000007: running pipeline (candidates -> features -> Random forest (tuned) -> Viterbi)
+16:29:48 | INFO | Trip 00000007: 1354 GPS points -> 123 route arcs, 0 unmatched, 0.59 s
+16:29:48 | INFO | Trip 00000007: Top-1 accuracy  HMM 99.34% | classifier-only 91.95%
+16:29:48 | INFO | Trip 00000007: route F1 98.37% | precision 98.37% | recall 98.37% | continuity 100.00%
+16:29:48 | INFO | POST /predict from 127.0.0.1 -> 200 (702 ms)
+16:29:51 | INFO | === Trip 00000009: running pipeline (candidates -> features -> Random forest (tuned) -> Viterbi)
+16:29:51 | INFO | Trip 00000009: 1049 GPS points -> 379 route arcs, 0 unmatched, 0.67 s
+16:29:51 | INFO | Trip 00000009: Top-1 accuracy  HMM 91.71% | classifier-only 86.46%
+16:29:51 | INFO | Trip 00000009: route F1 89.36% | precision 95.25% | recall 84.15% | continuity 85.71%
+16:29:51 | INFO | POST /predict from 127.0.0.1 -> 200 (801 ms)
+16:29:53 | INFO | === Trip 00000040: running pipeline (candidates -> features -> Random forest (tuned) -> Viterbi)
+16:29:54 | INFO | Trip 00000040: 2995 GPS points -> 323 route arcs, 0 unmatched, 1.01 s
+16:29:55 | INFO | Trip 00000040: Top-1 accuracy  HMM 95.39% | classifier-only 91.99%
+16:29:55 | INFO | Trip 00000040: route F1 97.39% | precision 98.35% | recall 96.44% | continuity 96.27%
+16:29:55 | INFO | POST /predict from 127.0.0.1 -> 200 (1266 ms)
+16:29:57 | INFO | === Trip 00000052: running pipeline (candidates -> features -> Random forest (tuned) -> Viterbi)
+16:29:57 | INFO | Trip 00000052: 262 GPS points -> 83 route arcs, 0 unmatched, 0.35 s
+16:29:57 | INFO | Trip 00000052: Top-1 accuracy  HMM 100.00% | classifier-only 95.42%
+16:29:57 | INFO | Trip 00000052: route F1 93.26% | precision 100.00% | recall 87.37% | continuity 89.02%
+16:29:57 | INFO | POST /predict from 127.0.0.1 -> 200 (403 ms)
+16:29:59 | INFO | === Trip 00000056: running pipeline (candidates -> features -> Random forest (tuned) -> Viterbi)
+16:30:01 | INFO | Trip 00000056: 3958 GPS points -> 1189 route arcs, 0 unmatched, 1.66 s
+16:30:01 | INFO | Trip 00000056: Top-1 accuracy  HMM 95.48% | classifier-only 88.66%
+16:30:01 | INFO | Trip 00000056: route F1 92.97% | precision 97.14% | recall 89.14% | continuity 88.64%
+16:30:01 | INFO | POST /predict from 127.0.0.1 -> 200 (2265 ms)
+16:30:03 | INFO | === Trip 00000065: running pipeline (candidates -> features -> Random forest (tuned) -> Viterbi)
+16:30:04 | INFO | Trip 00000065: 768 GPS points -> 139 route arcs, 0 unmatched, 0.60 s
+16:30:04 | INFO | Trip 00000065: Top-1 accuracy  HMM 91.67% | classifier-only 84.77%
+16:30:04 | INFO | Trip 00000065: route F1 93.66% | precision 95.68% | recall 91.72% | continuity 92.03%
+16:30:04 | INFO | POST /predict from 127.0.0.1 -> 200 (687 ms)
+16:30:06 | INFO | === Trip 00000076: running pipeline (candidates -> features -> Random forest (tuned) -> Viterbi)
+16:30:08 | INFO | Trip 00000076: 1486 GPS points -> 354 route arcs, 0 unmatched, 1.50 s
+16:30:08 | INFO | Trip 00000076: Top-1 accuracy  HMM 96.30% | classifier-only 85.80%
+16:30:08 | INFO | Trip 00000076: route F1 89.56% | precision 92.09% | recall 87.17% | continuity 87.25%
+16:30:08 | INFO | POST /predict from 127.0.0.1 -> 200 (1708 ms)
+16:30:10 | INFO | === Trip 00000077: running pipeline (candidates -> features -> Random forest (tuned) -> Viterbi)
+16:30:11 | INFO | Trip 00000077: 3911 GPS points -> 309 route arcs, 0 unmatched, 1.23 s
+16:30:11 | INFO | Trip 00000077: Top-1 accuracy  HMM 83.99% | classifier-only 69.24%
+16:30:11 | INFO | Trip 00000077: route F1 93.94% | precision 92.42% | recall 95.52% | continuity 93.51%
+16:30:11 | INFO | POST /predict from 127.0.0.1 -> 200 (1559 ms)
+16:30:14 | INFO | === Trip 00000091: running pipeline (candidates -> features -> Random forest (tuned) -> Viterbi)
+16:30:14 | INFO | Trip 00000091: 874 GPS points -> 184 route arcs, 0 unmatched, 0.64 s
+16:30:14 | INFO | Trip 00000091: Top-1 accuracy  HMM 91.99% | classifier-only 85.35%
+16:30:14 | INFO | Trip 00000091: route F1 85.58% | precision 96.74% | recall 76.72% | continuity 85.25%
+16:30:14 | INFO | POST /predict from 127.0.0.1 -> 200 (735 ms)
+16:30:28 | INFO | GET /health from 127.0.0.1 -> 200 (3 ms)
+16:30:30 | INFO | GET /trips from 127.0.0.1 -> 200 (3 ms)
+16:30:33 | INFO | === Trip 00000000: running pipeline (candidates -> features -> Random forest (tuned) -> Viterbi)
+16:30:34 | INFO | Trip 00000000: 2503 GPS points -> 187 route arcs, 0 unmatched, 0.76 s
+16:30:34 | INFO | Trip 00000000: Top-1 accuracy  HMM 96.68% | classifier-only 93.85%
+16:30:34 | INFO | Trip 00000000: route F1 94.77% | precision 93.48% | recall 96.09% | continuity 94.62%
+16:30:34 | INFO | POST /predict from 127.0.0.1 -> 200 (967 ms)
+16:30:36 | INFO | === Trip 00000007: running pipeline (candidates -> features -> Random forest (tuned) -> Viterbi)
+16:30:37 | INFO | Trip 00000007: 1354 GPS points -> 123 route arcs, 0 unmatched, 0.41 s
+16:30:37 | INFO | Trip 00000007: Top-1 accuracy  HMM 99.34% | classifier-only 91.95%
+16:30:37 | INFO | Trip 00000007: route F1 98.37% | precision 98.37% | recall 98.37% | continuity 100.00%
+16:30:37 | INFO | POST /predict from 127.0.0.1 -> 200 (523 ms)
+16:30:39 | INFO | === Trip 00000009: running pipeline (candidates -> features -> Random forest (tuned) -> Viterbi)
+16:30:40 | INFO | Trip 00000009: 1049 GPS points -> 379 route arcs, 0 unmatched, 0.69 s
+16:30:40 | INFO | Trip 00000009: Top-1 accuracy  HMM 91.71% | classifier-only 86.46%
+16:30:40 | INFO | Trip 00000009: route F1 89.36% | precision 95.25% | recall 84.15% | continuity 85.71%
+16:30:40 | INFO | POST /predict from 127.0.0.1 -> 200 (849 ms)
+16:30:42 | INFO | === Trip 00000040: running pipeline (candidates -> features -> Random forest (tuned) -> Viterbi)
+16:30:43 | INFO | Trip 00000040: 2995 GPS points -> 323 route arcs, 0 unmatched, 1.14 s
+16:30:43 | INFO | Trip 00000040: Top-1 accuracy  HMM 95.39% | classifier-only 91.99%
+16:30:43 | INFO | Trip 00000040: route F1 97.39% | precision 98.35% | recall 96.44% | continuity 96.27%
+16:30:43 | INFO | POST /predict from 127.0.0.1 -> 200 (1431 ms)
+16:30:45 | INFO | === Trip 00000052: running pipeline (candidates -> features -> Random forest (tuned) -> Viterbi)
+16:30:46 | INFO | Trip 00000052: 262 GPS points -> 83 route arcs, 0 unmatched, 0.35 s
+16:30:46 | INFO | Trip 00000052: Top-1 accuracy  HMM 100.00% | classifier-only 95.42%
+16:30:46 | INFO | Trip 00000052: route F1 93.26% | precision 100.00% | recall 87.37% | continuity 89.02%
+16:30:46 | INFO | POST /predict from 127.0.0.1 -> 200 (408 ms)
+16:30:48 | INFO | === Trip 00000056: running pipeline (candidates -> features -> Random forest (tuned) -> Viterbi)
+16:30:49 | INFO | Trip 00000056: 3958 GPS points -> 1189 route arcs, 0 unmatched, 1.67 s
+16:30:50 | INFO | Trip 00000056: Top-1 accuracy  HMM 95.48% | classifier-only 88.66%
+16:30:50 | INFO | Trip 00000056: route F1 92.97% | precision 97.14% | recall 89.14% | continuity 88.64%
+16:30:50 | INFO | POST /predict from 127.0.0.1 -> 200 (2254 ms)
+16:30:52 | INFO | === Trip 00000065: running pipeline (candidates -> features -> Random forest (tuned) -> Viterbi)
+16:30:53 | INFO | Trip 00000065: 768 GPS points -> 139 route arcs, 0 unmatched, 0.56 s
+16:30:53 | INFO | Trip 00000065: Top-1 accuracy  HMM 91.67% | classifier-only 84.77%
+16:30:53 | INFO | Trip 00000065: route F1 93.66% | precision 95.68% | recall 91.72% | continuity 92.03%
+16:30:53 | INFO | POST /predict from 127.0.0.1 -> 200 (664 ms)
+16:30:55 | INFO | === Trip 00000076: running pipeline (candidates -> features -> Random forest (tuned) -> Viterbi)
+16:30:56 | INFO | Trip 00000076: 1486 GPS points -> 354 route arcs, 0 unmatched, 1.64 s
+16:30:57 | INFO | Trip 00000076: Top-1 accuracy  HMM 96.30% | classifier-only 85.80%
+16:30:57 | INFO | Trip 00000076: route F1 89.56% | precision 92.09% | recall 87.17% | continuity 87.25%
+16:30:57 | INFO | POST /predict from 127.0.0.1 -> 200 (1848 ms)
+16:30:59 | INFO | === Trip 00000077: running pipeline (candidates -> features -> Random forest (tuned) -> Viterbi)
+16:31:00 | INFO | Trip 00000077: 3911 GPS points -> 309 route arcs, 0 unmatched, 1.32 s
+16:31:00 | INFO | Trip 00000077: Top-1 accuracy  HMM 83.99% | classifier-only 69.24%
+16:31:00 | INFO | Trip 00000077: route F1 93.94% | precision 92.42% | recall 95.52% | continuity 93.51%
+16:31:00 | INFO | POST /predict from 127.0.0.1 -> 200 (1628 ms)
+16:31:02 | INFO | === Trip 00000091: running pipeline (candidates -> features -> Random forest (tuned) -> Viterbi)
+16:31:03 | INFO | Trip 00000091: 874 GPS points -> 184 route arcs, 0 unmatched, 0.67 s
+16:31:03 | INFO | Trip 00000091: Top-1 accuracy  HMM 91.99% | classifier-only 85.35%
+16:31:03 | INFO | Trip 00000091: route F1 85.58% | precision 96.74% | recall 76.72% | continuity 85.25%
+16:31:03 | INFO | POST /predict from 127.0.0.1 -> 200 (804 ms)
