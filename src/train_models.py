@@ -2,6 +2,7 @@
 
 import argparse
 import json
+import os
 from pathlib import Path
 from statistics import median
 from time import perf_counter
@@ -56,6 +57,33 @@ def model_candidates(jobs):
             scale=True,
         ),
     }
+
+
+def resolve_student_folder(root):
+    """Resolve a dataset root or a folder containing one extracted dataset."""
+    root = root.expanduser().resolve()
+    if not root.is_dir():
+        raise ValueError(f"Dataset path does not exist or is not a directory: {root}")
+    if (root / "train").is_dir() and (root / "student_test").is_dir():
+        return root
+
+    matches = []
+    for directory, folders, _ in os.walk(root):
+        if {"train", "student_test"}.issubset(folders):
+            matches.append(Path(directory))
+            folders.clear()
+        else:
+            folders[:] = [name for name in folders if not name.startswith(".")]
+
+    if len(matches) == 1:
+        return matches[0]
+    if matches:
+        choices = "\n".join(str(path) for path in sorted(matches))
+        raise ValueError(f"Multiple datasets found. Pass one of these folders:\n{choices}")
+    raise ValueError(
+        f"No folder under {root} contains both train and student_test. "
+        "Extract the student dataset and pass its containing folder."
+    )
 
 
 def read_partition(root, partition, feature_options):
@@ -302,8 +330,13 @@ def main():
         parser.error("Use positive radius, candidate cap, heading gap and jobs, and at least two folds.")
 
     options = {"radius_m": args.radius_m, "max_k": args.max_k, "max_heading_gap_s": args.max_heading_gap_s}
-    train, train_truth, excluded = read_partition(args.student_folder, "train", options)
-    test, test_truth, _ = read_partition(args.student_folder, "student_test", options)
+    try:
+        data_root = resolve_student_folder(args.student_folder)
+    except ValueError as error:
+        parser.error(str(error))
+    print(f"Using dataset at {data_root}", flush=True)
+    train, train_truth, excluded = read_partition(data_root, "train", options)
+    test, test_truth, _ = read_partition(data_root, "student_test", options)
     if set(train_truth["trip_id"]) & set(test_truth["trip_id"]):
         raise ValueError("Train and test contain overlapping trip IDs.")
     comparison = compare(train, train_truth, test, test_truth, n_splits=args.folds, jobs=args.jobs)

@@ -30,10 +30,10 @@ Run from the repository root:
 ```powershell
 python -m pip install -r requirements.txt
 python -m unittest discover -s tests -p test_person_b.py
-python -m src.train_models ".\Student folder"
+python -m src.train_models .
 ```
 
-The input path should contain `train` and `student_test`. Use `--output` to set a separate result directory for each run. The default is `results/person_b`.
+Pass the folder containing `train` and `student_test`, or a parent containing exactly one extracted dataset. Use `--output` to set a separate result directory for each run. The default is `results/person_b`.
 
 - `model_comparison.csv`, `cv_folds.csv`, `model_comparison.png`, `section3_results.md`, and `test_trip_accuracy.csv` support the report.
 - `best_model.joblib` contains the fitted classifier pipeline and feature-generation settings. Load it with the same library versions used for training.

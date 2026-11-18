@@ -9,7 +9,7 @@ import pandas as pd
 
 from src.candidate_features import build_features
 from src.load_data import load_trip
-from src.train_models import compare, predict_trip, read_partition, write_results
+from src.train_models import compare, predict_trip, read_partition, resolve_student_folder, write_results
 
 
 def write_trip(root, partition, trip_id, *, reverse=False, gap=False):
@@ -33,10 +33,11 @@ def write_trip(root, partition, trip_id, *, reverse=False, gap=False):
 class ModelComparisonTest(unittest.TestCase):
     def test_grouped_comparison_and_candidate_miss(self):
         with TemporaryDirectory() as directory:
-            root = Path(directory)
+            root = Path(directory) / "extracted" / "Student folder"
             for i in range(3):
                 write_trip(root, "train", f"{i:08d}", reverse=(i == 1))
             trip = load_trip(write_trip(root, "student_test", "00000099", gap=True))
+            self.assertEqual(resolve_student_folder(Path(directory)), root.resolve())
             features = build_features(trip)
             self.assertEqual(set(features["obs_idx"]), {0, 1, 2})
             forward = features.loc[features["arc_id"] == 0, "heading_diff_deg"]
