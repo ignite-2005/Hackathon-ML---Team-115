@@ -1,9 +1,14 @@
 pandas
 numpy
-scikit-learn
+scikit-learn>=1.2
 folium
 fastapi
 uvicorn
 streamlit
 requests
 optuna
+joblib
+matplotlib>=3.6
+pyarrow
+pyproj
+shapely>=2
