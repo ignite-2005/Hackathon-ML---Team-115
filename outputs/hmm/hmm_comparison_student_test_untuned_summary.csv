@@ -1,0 +1,7 @@
+,top1,continuity,precision,recall,f1
+nearest arc,54.264,47.249,56.267,63.253,59.556
+classifier only,85.465,75.425,82.561,86.84,84.647
+gaussian+viterbi (untuned),89.588,89.946,94.691,90.782,92.695
+gaussian+viterbi (tuned),90.626,89.059,92.913,89.106,90.97
+classifier+viterbi (untuned),93.001,90.117,96.126,90.099,93.015
+classifier+viterbi (tuned),93.387,89.908,95.818,89.603,92.606

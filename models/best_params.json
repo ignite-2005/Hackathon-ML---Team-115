@@ -1,0 +1,24 @@
+{
+  "model": "Random forest",
+  "params": {
+    "n_estimators": 110,
+    "max_depth": 12,
+    "min_samples_leaf": 1,
+    "max_features": 1.0,
+    "max_samples": 0.24959257519072167,
+    "class_weight": null
+  },
+  "trial": 48,
+  "cv_macro_f1_mean": 0.9042649019154878,
+  "cv_log_loss_mean": 0.10656900519042115,
+  "cv_macro_f1_std": 0.034176508313428146,
+  "cv_top1_mean": 0.7701904224989624,
+  "fit_seconds_mean": 2.669400960000348,
+  "folds_done": 5,
+  "objective": "mean 5-fold GroupKFold candidate macro F1, all 80 train trips (fold models fitted on 25% of GPS points per trip, scored on the full validation fold)",
+  "sampler": "TPESampler(seed=42)",
+  "pruner": "MedianPruner(n_startup_trials=5, n_warmup_steps=1)",
+  "n_trials": 50,
+  "n_complete": 40,
+  "n_pruned": 10
+}
