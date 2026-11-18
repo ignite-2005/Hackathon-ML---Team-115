@@ -1,0 +1,16 @@
+{
+  "classifier": {
+    "beta_m": 1.0,
+    "w": 4.0,
+    "gap_threshold_s": 120.0,
+    "train_top1": 92.5750300120048,
+    "train_route_f1": 93.07124643261226
+  },
+  "gaussian": {
+    "beta_m": 5.0,
+    "w": 4.0,
+    "gap_threshold_s": 120.0,
+    "train_top1": 92.39823202008075,
+    "train_route_f1": 92.12109061748194
+  }
+}
