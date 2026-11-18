@@ -3,3 +3,4 @@ __pycache__/
 data/
 *.parquet
 test_one_trip.py
+results/person_b/*.joblib
