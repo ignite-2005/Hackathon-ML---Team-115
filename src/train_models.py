@@ -13,7 +13,7 @@ import pandas as pd
 from sklearn.ensemble import HistGradientBoostingClassifier, RandomForestClassifier
 from sklearn.impute import SimpleImputer
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import f1_score, log_loss
+from sklearn.metrics import confusion_matrix, log_loss
 from sklearn.model_selection import GroupKFold
 from sklearn.naive_bayes import GaussianNB
 from sklearn.neural_network import MLPClassifier
@@ -86,7 +86,7 @@ def resolve_student_folder(root):
     )
 
 
-def read_partition(root, partition, feature_options):
+def read_partition(root, partition, feature_options, *, exclude_flagged_train=False):
     folders = sorted(
         folder for folder in (root / partition).iterdir()
         if folder.is_dir() and not folder.name.startswith(".")
@@ -96,11 +96,15 @@ def read_partition(root, partition, feature_options):
         trip = load_trip(folder)
         truth = align_route(trip)
         distance = float(truth["true_dist_m"].median())
-        if partition == "train" and distance > MAX_MEDIAN_TRUE_DIST_M:
+        if exclude_flagged_train and partition == "train" and distance > MAX_MEDIAN_TRUE_DIST_M:
             excluded.append({"trip_id": trip["trip_id"], "median_true_dist_m": distance})
             continue
         features = build_features(trip, **feature_options)
-        rows = add_labels(features, truth)[KEY + ["arc_id", "label"] + FEATURE_COLUMNS]
+        arcs = trip["arcs"].iloc[features["arc_id"].to_numpy(dtype=np.intp)]
+        features[["from_node", "to_node"]] = arcs[["from_node", "to_node"]].to_numpy()
+        rows = add_labels(features, truth)[
+            KEY + ["arc_id", "label", "timestamp", "from_node", "to_node"] + FEATURE_COLUMNS
+        ]
         rows = rows.astype(dict.fromkeys(FEATURE_COLUMNS, np.float32))
         frames.append(rows)
         truths.append(truth[KEY + ["true_arc"]])
@@ -135,16 +139,38 @@ def winner_positions(rows, scores):
     return ranked.groupby(KEY, sort=False)["score"].idxmax().to_numpy(dtype=np.intp)
 
 
-def evaluate(rows, truth, scores, *, probabilistic):
+def direct_route_continuity(winners, max_gap_s):
+    """Share of eligible consecutive GPS pairs on the same or directly adjacent arcs."""
+    previous = winners.shift()
+    dt = winners["timestamp"] - previous["timestamp"]
+    eligible = (
+        winners["trip_id"].eq(previous["trip_id"])
+        & winners["obs_idx"].sub(previous["obs_idx"]).eq(1)
+        & dt.gt(0) & dt.le(max_gap_s)
+    )
+    count = int(eligible.sum())
+    connected = winners["arc_id"].eq(previous["arc_id"]) | winners["from_node"].eq(previous["to_node"])
+    return (int((eligible & connected).sum()) / count if count else np.nan), count
+
+
+def evaluate(rows, truth, scores, *, probabilistic, max_gap_s=5.0):
     positions = winner_positions(rows, scores)
     labels = rows["label"].to_numpy()
     hits = int(labels[positions].sum())
     count = len(truth)
+    continuity, eligible_pairs = direct_route_continuity(rows.iloc[positions], max_gap_s)
     result = {
+        "direct_route_continuity": continuity,
+        "continuity_pairs": eligible_pairs,
         "top1_accuracy": hits / count,
         "top1_f1": 2 * hits / (count + len(positions)),
         "candidate_coverage": int(labels.sum()) / count,
         "candidate_f1": np.nan,
+        "candidate_macro_f1": np.nan,
+        "candidate_precision": np.nan,
+        "candidate_recall": np.nan,
+        "candidate_accuracy": np.nan,
+        "tn": 0, "fp": 0, "fn": 0, "tp": 0,
         "log_loss": np.nan,
     }
     if len(rows):
@@ -154,7 +180,21 @@ def evaluate(rows, truth, scores, *, probabilistic):
         else:
             hard = np.zeros(len(rows), dtype=bool)
             hard[positions] = True
-        result["candidate_f1"] = f1_score(labels, hard, zero_division=0)
+        tn, fp, fn, tp = (int(value) for value in confusion_matrix(labels, hard, labels=[0, 1]).ravel())
+
+        def ratio(numerator, denominator):
+            return numerator / denominator if denominator else 0.0
+
+        positive_f1 = ratio(2 * tp, 2 * tp + fp + fn)
+        negative_f1 = ratio(2 * tn, 2 * tn + fp + fn)
+        result.update(
+            candidate_f1=positive_f1,
+            candidate_macro_f1=(positive_f1 + negative_f1) / 2,
+            candidate_precision=ratio(tp, tp + fp),
+            candidate_recall=ratio(tp, tp + fn),
+            candidate_accuracy=ratio(tp + tn, len(rows)),
+            tn=tn, fp=fp, fn=fn, tp=tp,
+        )
     return result
 
 
@@ -175,7 +215,7 @@ def score(estimator, rows):
     return -rows["dist_m"].to_numpy() if estimator is None else score_candidates(estimator, rows)
 
 
-def compare(train, train_truth, test, test_truth, *, n_splits, jobs):
+def compare(train, train_truth, test, test_truth, *, n_splits, jobs, max_gap_s=5.0):
     folds = list(make_folds(train, train_truth, n_splits))
     models = {BASELINE: None, **model_candidates(jobs)}
     cv_rows = []
@@ -183,41 +223,54 @@ def compare(train, train_truth, test, test_truth, *, n_splits, jobs):
         print(f"Cross-validating {name}", flush=True)
         for fold, (fit_mask, val_mask, val_truth) in enumerate(folds, start=1):
             print(f"  Fold {fold}/{n_splits}", flush=True)
-            fold_started = perf_counter()
+            started = perf_counter()
             if estimator is not None:
                 estimator.fit(train.loc[fit_mask, FEATURE_COLUMNS], train.loc[fit_mask, "label"])
+            fit_seconds = perf_counter() - started if estimator is not None else 0.0
             val = train.loc[val_mask]
-            metrics = evaluate(val, val_truth, score(estimator, val), probabilistic=estimator is not None)
+            metrics = evaluate(val, val_truth, score(estimator, val),
+                               probabilistic=estimator is not None, max_gap_s=max_gap_s)
             cv_rows.append({
                 "model": name, "fold": fold,
                 "validation_trips": " ".join(sorted(val_truth["trip_id"].unique())),
-                **metrics,
+                "fit_seconds": fit_seconds, **metrics,
             })
-            print(f"    Finished in {perf_counter() - fold_started:.1f}s", flush=True)
+            print(f"    Finished in {perf_counter() - started:.1f}s", flush=True)
 
     cv = pd.DataFrame(cv_rows)
     summary = cv.groupby("model", sort=False).agg(
         cv_f1_mean=("candidate_f1", "mean"),
         cv_f1_std=("candidate_f1", "std"),
+        cv_macro_f1_mean=("candidate_macro_f1", "mean"),
+        cv_macro_f1_std=("candidate_macro_f1", "std"),
         cv_top1_mean=("top1_accuracy", "mean"),
+        cv_fit_seconds_mean=("fit_seconds", "mean"),
     )
     selected = summary.drop(index=BASELINE).sort_values(
-        ["cv_top1_mean", "cv_f1_mean"], ascending=False, kind="stable"
+        ["cv_top1_mean", "cv_macro_f1_mean"], ascending=False, kind="stable"
     ).index[0]
 
     test_rows, exported_scores = [], {}
     for name, estimator in models.items():
-        print(f"Fitting on all training trips and scoring test set: {name}", flush=True)
+        print(f"Final training and test scoring: {name}", flush=True)
+        started = perf_counter()
         if estimator is not None:
             estimator.fit(train[FEATURE_COLUMNS], train["label"])
+        fit_seconds = perf_counter() - started if estimator is not None else 0.0
+        train_metrics = evaluate(train, train_truth, score(estimator, train),
+                                 probabilistic=estimator is not None, max_gap_s=max_gap_s)
         timings = []
         for _ in range(3):
             start = perf_counter()
             scores = score(estimator, test)
             timings.append(1000 * (perf_counter() - start))
-        metrics = evaluate(test, test_truth, scores, probabilistic=estimator is not None)
+        metrics = evaluate(test, test_truth, scores,
+                           probabilistic=estimator is not None, max_gap_s=max_gap_s)
         test_rows.append({
             "model": name, **{f"test_{key}": value for key, value in metrics.items()},
+            "train_macro_f1": train_metrics["candidate_macro_f1"],
+            "train_top1_accuracy": train_metrics["top1_accuracy"],
+            "fit_seconds": fit_seconds,
             "inference_ms": median(timings), "selected_by_cv": name == selected,
         })
         if name in (BASELINE, selected):
@@ -234,22 +287,22 @@ def write_comparison(output, cv, summary, selected):
     cv.to_csv(output / "cv_folds.csv", index=False)
     summary.to_csv(output / "model_comparison.csv", index=False)
     panels = [
-        ("cv_f1_mean", "CV candidate F1"),
+        ("cv_macro_f1_mean", "CV candidate macro F1"),
         ("test_top1_accuracy", "Test Top-1 accuracy"),
-        ("test_candidate_f1", "Test candidate F1"),
-        ("test_top1_f1", "Test Top-1 arc F1"),
+        ("test_candidate_macro_f1", "Test candidate macro F1"),
+        ("test_direct_route_continuity", "Test direct route continuity"),
         ("test_log_loss", "Test log loss"),
         ("inference_ms", "Test scoring time (ms)"),
     ]
     fig, axes = plt.subplots(2, 3, figsize=(17, 7), layout="constrained")
     for ax, (column, title) in zip(axes.flat, panels):
         rows = summary.dropna(subset=[column])
-        errors = rows["cv_f1_std"].fillna(0) if column == "cv_f1_mean" else None
+        errors = rows["cv_macro_f1_std"].fillna(0) if column == "cv_macro_f1_mean" else None
         colors = np.where(rows["selected_by_cv"], "#15616d", "#8e9aaf")
         ax.barh(rows["model"], rows[column], xerr=errors, color=colors)
         ax.invert_yaxis()
         ax.set_title(title)
-        if column.endswith("f1") or column in {"cv_f1_mean", "test_top1_accuracy"}:
+        if column.endswith("f1") or column in {"cv_macro_f1_mean", "test_top1_accuracy", "test_direct_route_continuity"}:
             ax.set_xlim(0, 1.05)
     fig.savefig(output / "model_comparison.png", dpi=160)
     plt.close(fig)
@@ -257,15 +310,17 @@ def write_comparison(output, cv, summary, selected):
     report = [
         "## Model comparison results", "",
         f"Selected using training cross-validation: **{selected}**.", "",
-        "| Model | CV candidate F1 (mean ± SD) | Test Top-1 accuracy | Test candidate F1 | Test Top-1 F1 | Test log loss | Scoring time (ms) |",
-        "| --- | ---: | ---: | ---: | ---: | ---: | ---: |",
+        "| Model | CV macro F1 (mean +/- SD) | Test Top-1 | Test macro F1 | Test precision | Test recall | Test continuity | Test log loss | Fit (s) | Score (ms) |",
+        "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
     ]
     for row in summary.itertuples(index=False):
-        loss = "—" if pd.isna(row.test_log_loss) else f"{row.test_log_loss:.4f}"
+        loss = "N/A (hard choice)" if pd.isna(row.test_log_loss) else f"{row.test_log_loss:.4f}"
         report.append(
-            f"| {row.model} | {row.cv_f1_mean:.4f} ± {row.cv_f1_std:.4f} | "
-            f"{row.test_top1_accuracy:.4f} | {row.test_candidate_f1:.4f} | "
-            f"{row.test_top1_f1:.4f} | {loss} | {row.inference_ms:.2f} |"
+            f"| {row.model} | {row.cv_macro_f1_mean:.4f} +/- {row.cv_macro_f1_std:.4f} | "
+            f"{row.test_top1_accuracy:.4f} | {row.test_candidate_macro_f1:.4f} | "
+            f"{row.test_candidate_precision:.4f} | {row.test_candidate_recall:.4f} | "
+            f"{row.test_direct_route_continuity:.4f} | {loss} | "
+            f"{row.fit_seconds:.2f} | {row.inference_ms:.2f} |"
         )
     report.extend([
         "", f"Test candidate coverage was {summary['test_candidate_coverage'].iloc[0]:.2%}.",
@@ -306,7 +361,9 @@ def write_results(output, train_truth, test_truth, test, cv, summary,
 
     metadata = {
         "selected_model": selected,
-        "selection": "Mean trip-grouped CV Top-1 accuracy, then mean CV candidate F1",
+        "selection": "Mean trip-grouped CV Top-1 accuracy, then mean CV candidate macro F1",
+        "seed": SEED,
+        "estimator_parameters": estimator.steps[-1][1].get_params(),
         "training_trips": sorted(train_truth["trip_id"].unique()),
         "test_trips": sorted(test_truth["trip_id"].unique()),
         "excluded_training_trips": excluded,
@@ -325,6 +382,8 @@ def main():
     parser.add_argument("--max-heading-gap-s", type=float, default=5.0)
     parser.add_argument("--folds", type=int, default=5)
     parser.add_argument("--jobs", type=int, default=2, help="Parallel workers for Random Forest")
+    parser.add_argument("--exclude-flagged-train", action="store_true",
+                        help="Optional sensitivity run excluding low-quality training labels")
     args = parser.parse_args()
     if not (
         np.isfinite(args.radius_m) and args.radius_m > 0
@@ -339,11 +398,16 @@ def main():
     except ValueError as error:
         parser.error(str(error))
     print(f"Using dataset at {data_root}", flush=True)
-    train, train_truth, excluded = read_partition(data_root, "train", options)
+    train, train_truth, excluded = read_partition(
+        data_root, "train", options, exclude_flagged_train=args.exclude_flagged_train
+    )
     test, test_truth, _ = read_partition(data_root, "student_test", options)
     if set(train_truth["trip_id"]) & set(test_truth["trip_id"]):
         raise ValueError("Train and test contain overlapping trip IDs.")
-    comparison = compare(train, train_truth, test, test_truth, n_splits=args.folds, jobs=args.jobs)
+    comparison = compare(
+        train, train_truth, test, test_truth, n_splits=args.folds, jobs=args.jobs,
+        max_gap_s=args.max_heading_gap_s,
+    )
     write_results(args.output, train_truth, test_truth, test, *comparison, options, excluded)
     print(comparison[1].to_string(index=False))
     print(f"Selected {comparison[2]}. Results written to {args.output}.")
