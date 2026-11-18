@@ -2,6 +2,7 @@
 __pycache__/
 data/
 *.parquet
+.DS_Store
 test_one_trip.py
 results/person_b/*.joblib
 report/PathSnap_Team115_Report.html
