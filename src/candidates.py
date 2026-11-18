@@ -15,15 +15,20 @@ import shapely
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from load_data import load_trip
-from geo import to_metres, project_onto_segments
+from geo import to_metres, trip_epsg, project_onto_segments
 
 
 def arc_geometry(d):
     """Arc endpoints in metres: ax, ay, bx, by arrays indexed by arc_id."""
-    nx_, ny_ = to_metres(d["nodes"]["lon"], d["nodes"]["lat"])
+    nx_, ny_ = to_metres(d["nodes"]["lon"], d["nodes"]["lat"], trip_epsg(d))
     a = d["arcs"]["from_node"].values
     b = d["arcs"]["to_node"].values
     return nx_[a], ny_[a], nx_[b], ny_[b]
+
+
+# Training-data quality rule: if the median GPS-to-reference-arc distance of a trip
+# is above this, the GPS and reference route don't agree, so its labels are unreliable.
+MAX_MEDIAN_TRUE_DIST_M = 50.0
 
 
 def generate_candidates(d, radius_m=50.0, max_k=16):
@@ -33,7 +38,7 @@ def generate_candidates(d, radius_m=50.0, max_k=16):
     trip_id, obs_idx, timestamp, x, y, arc_id, dist_m, offset_m, arc_len_m
     """
     tr = d["track"]
-    px, py = to_metres(tr["lon"], tr["lat"])
+    px, py = to_metres(tr["lon"], tr["lat"], trip_epsg(d))
     ax, ay, bx, by = arc_geometry(d)
 
     # Spatial index over arc lines, so we don't compare every point with every arc
@@ -72,7 +77,7 @@ def align_route(d):
     Returns true_arc and true_dist_m per GPS point.
     """
     tr = d["track"]
-    px, py = to_metres(tr["lon"], tr["lat"])
+    px, py = to_metres(tr["lon"], tr["lat"], trip_epsg(d))
     ax, ay, bx, by = arc_geometry(d)
     r = d["route"]["arc_id"].values
     rax, ray, rbx, rby = ax[r], ay[r], bx[r], by[r]
@@ -137,6 +142,8 @@ if __name__ == "__main__":
                          "cands_per_point": round(len(c) / len(truth), 1),
                          "miss_rate_pct": round(miss_rate(c, truth), 2),
                          "median_true_dist_m": round(truth["true_dist_m"].median(), 1),
+                         # labels are unreliable if GPS is typically far from its reference arc
+                         "label_quality_ok": bool(truth["true_dist_m"].median() <= MAX_MEDIAN_TRUE_DIST_M),
                          "seconds": round(time.time() - t0, 1)})
             all_c.append(c)
             all_t.append(truth)
