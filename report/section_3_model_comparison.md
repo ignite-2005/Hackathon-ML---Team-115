@@ -17,7 +17,7 @@ Candidate F1 uses a 0.5 probability threshold. Candidate log loss uses the posit
 | Nearest arc | Picks the closest candidate and provides a geometry-only baseline. | Parallel roads and opposite arcs can have almost identical distances. |
 | Logistic regression | Learns a linear log-odds function with scaled inputs. It gives fast probability estimates. | Heading may matter more at higher speeds, which a linear model without interaction terms may miss. |
 | Gaussian naive Bayes | Uses a per-class Gaussian likelihood for each feature and combines the likelihoods. It gives a lightweight generative baseline. | Distance and distance rank are correlated. Compare candidate log loss with ranking accuracy. |
-| Random forest | Averages independent trees trained on bootstrap samples, with randomized feature choices. It can learn motion and geometry interactions. | Compare grouped CV variance and scoring cost. |
+| Random forest | Averages 64 trees with randomized feature choices. Each tree draws a bootstrap sample of 15% of the fold's candidate rows. It can learn motion and geometry interactions. | Compare grouped CV variance and scoring cost. |
 | Histogram gradient boosting | Fits trees sequentially to reduce classification loss. Histograms make training practical on many candidate rows. | Compare log loss and Top-1 with the forest and check whether better probabilities improve arc picks. |
 | Neural network | A small multilayer perceptron learns nonlinear combinations of scaled features. | Check CV variability, convergence warnings, and scoring time. |
 

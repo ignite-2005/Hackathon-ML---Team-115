@@ -41,7 +41,7 @@ def model_candidates(jobs):
         "Random forest": pipeline(
             RandomForestClassifier(
                 n_estimators=64, max_depth=14, min_samples_leaf=20,
-                n_jobs=jobs, random_state=SEED,
+                max_samples=0.15, n_jobs=jobs, random_state=SEED,
             )
         ),
         "Histogram gradient boosting": pipeline(
@@ -182,6 +182,8 @@ def compare(train, train_truth, test, test_truth, *, n_splits, jobs):
     for name, estimator in models.items():
         print(f"Cross-validating {name}", flush=True)
         for fold, (fit_mask, val_mask, val_truth) in enumerate(folds, start=1):
+            print(f"  Fold {fold}/{n_splits}", flush=True)
+            fold_started = perf_counter()
             if estimator is not None:
                 estimator.fit(train.loc[fit_mask, FEATURE_COLUMNS], train.loc[fit_mask, "label"])
             val = train.loc[val_mask]
@@ -191,6 +193,7 @@ def compare(train, train_truth, test, test_truth, *, n_splits, jobs):
                 "validation_trips": " ".join(sorted(val_truth["trip_id"].unique())),
                 **metrics,
             })
+            print(f"    Finished in {perf_counter() - fold_started:.1f}s", flush=True)
 
     cv = pd.DataFrame(cv_rows)
     summary = cv.groupby("model", sort=False).agg(
@@ -204,6 +207,7 @@ def compare(train, train_truth, test, test_truth, *, n_splits, jobs):
 
     test_rows, exported_scores = [], {}
     for name, estimator in models.items():
+        print(f"Fitting on all training trips and scoring test set: {name}", flush=True)
         if estimator is not None:
             estimator.fit(train[FEATURE_COLUMNS], train["label"])
         timings = []
@@ -320,7 +324,7 @@ def main():
     parser.add_argument("--max-k", type=int, default=16)
     parser.add_argument("--max-heading-gap-s", type=float, default=5.0)
     parser.add_argument("--folds", type=int, default=5)
-    parser.add_argument("--jobs", type=int, default=2)
+    parser.add_argument("--jobs", type=int, default=2, help="Parallel workers for Random Forest")
     args = parser.parse_args()
     if not (
         np.isfinite(args.radius_m) and args.radius_m > 0
