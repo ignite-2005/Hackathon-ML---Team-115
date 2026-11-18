@@ -24,14 +24,14 @@ points). See `results/api/student_test_pipeline_results.csv`.
 
 | Folder | Contents | Owner |
 | --- | --- | --- |
-| `src/` | Data loading and inventory (`load_data.py`), EDA plots and Folium maps (`eda.py`), per-trip metric projection (`geo.py`), candidate generation and labels (`candidates.py`), radius sweep (`radius_sweep.py`), features (`candidate_features.py`), model training and comparison (`train_models.py`, `neural_network_curve.py`) | A, B |
-| `hmm/` | Road graph, HMM states, emissions, transitions, Viterbi, edge cases, route building, metrics, decoder entry point (`decode.py`), map of a decoded trip (`map_trip.py`), config (`hmm_config.json`) | C |
+| `src/` | Data loading and inventory (`load_data.py`), EDA plots and Folium maps (`eda.py`), per-trip metric projection (`geo.py`), candidate generation and labels (`candidates.py`), radius sweep (`radius_sweep.py`), features (`candidate_features.py`), model training and comparison (`train_models.py`, `neural_network_curve.py`), final predicted-route Folium map (`final_map.py`) | A, B |
+| `hmm/` | Road graph, HMM states, emissions, transitions, Viterbi, edge cases, route building, metrics, decoder entry point (`decode.py`), config (`hmm_config.json`), classifier + HMM decoder tuning and comparison (`classifier_hmm.py`), backward-move analysis (`check_backward.py`), map of a decoded trip (`map_trip.py`), prediction export for the maps (`export_predictions.py`) | C |
 | `tuning/` | Bayesian optimisation of the Random forest (Optuna: `hpo.py`, `evaluate_tuned.py`, `study.db`) | C |
 | `api/` | FastAPI backend (`main.py`) and the inference pipeline (`pipeline.py`) | D |
 | `ui/` | Streamlit evaluator UI (`app.py`) | D |
 | `deploy/` | `run_api.ps1` (Laptop 1) and `run_ui.ps1` (Laptop 2) | D |
 | `tests/` | Unit tests (`test_person_b.py`, `test_api.py`) | B, D |
-| `outputs/` | EDA, candidate, sweep and HMM outputs (CSV, PNG, Folium HTML) | A, C |
+| `outputs/` | EDA (`eda/`), candidates (`candidates/`, parquet files are generated and git-ignored), radius sweep (`sweep/`), Bayesian optimisation (`tuning/`), HMM results (`hmm/`) and predicted-route Folium maps (`maps/`) | A, C |
 | `models/` | Deployed model `rf_tuned.joblib` (Optuna-tuned Random forest) and `best_params.json` | C |
 | `results/` | Model comparison results and the untuned model (`person_b_final/`), API results and console log (`api/`) | B, D |
 | `report/` | Report sections (Markdown), figures, `build_report.py` and the combined PDF | all |
@@ -49,7 +49,7 @@ Student folder/
 
 ## Installation
 
-Python 3.12 on Windows (tested). The same steps work on macOS/Linux with `source .venv/bin/activate`.
+Python 3.12 or 3.13 on Windows (both used in the team). The same steps work on macOS/Linux with `source .venv/bin/activate`.
 
 ```powershell
 python -m venv .venv
@@ -70,12 +70,17 @@ Run from the repository root. `DATA` = path to the `Student folder` that contain
 | --- | --- | --- |
 | Inventory | `python src/load_data.py DATA outputs/inventory.csv` | per-trip counts and checks |
 | EDA and Folium map | `python src/eda.py DATA outputs/eda 00000033` | plots, `trip_stats.csv`, `map_*.html` |
-| Candidates and labels | `python src/candidates.py DATA outputs/candidates` | parquet files and miss-rate summaries |
+| Candidates and labels | `python src/candidates.py DATA outputs/candidates` | parquet files (git-ignored, needed by the HMM scripts) and miss-rate summaries |
 | Radius sweep (train) | `python src/radius_sweep.py DATA outputs/sweep` | `radius_sweep_train.csv/png` |
 | Model comparison | `python -m src.train_models DATA --output results/person_b_final` | comparison table, plots, `best_model.joblib` |
 | Bayesian optimisation | `python tuning/hpo.py run DATA --trials 50`, `python tuning/hpo.py report`, `python tuning/evaluate_tuned.py DATA` | `models/rf_tuned.joblib`, `outputs/tuning/` |
-| HMM / Viterbi | `python hmm/viterbi.py DATA` | `outputs/hmm/viterbi_student_test.csv` |
+| HMM: sigma and beta | `python hmm/transitions.py DATA` | `outputs/hmm/estimated_params.json` |
+| HMM: Gaussian Viterbi baseline | `python hmm/viterbi.py DATA` | `outputs/hmm/viterbi_student_test.csv` |
+| HMM: edge cases | `python hmm/edge_cases.py DATA` | `outputs/hmm/edge_cases_student_test.csv` |
+| HMM: backward-move analysis | `python hmm/check_backward.py DATA` | `outputs/hmm/backward_cases_*.csv` |
+| Classifier + HMM (needs `models/best_params.json`) | `python hmm/classifier_hmm.py probas DATA --params tuned`, then `tune`, then `compare` (same arguments) | `outputs/hmm/decoder_tuning_train_tuned.csv`, `outputs/hmm/hmm_comparison_student_test_tuned*.csv` |
 | Full pipeline offline | `python api/pipeline.py DATA/student_test --out results/api/student_test_pipeline_results.csv` | per-trip Top-1 and route metrics |
+| Predicted-route maps | `python hmm/export_predictions.py DATA/student_test 00000007 00000052 00000076 00000077`, then `python src/final_map.py DATA <trip> outputs/maps/predictions_student_test.csv outputs/maps/final_<trip>.html` | `outputs/maps/` |
 | Tests | `python -m unittest tests.test_api tests.test_person_b` | |
 | Report PDF | `python report/build_report.py` | `report/PathSnap_Team115_Report.pdf` |
 
@@ -97,7 +102,8 @@ from an admin PowerShell:
 ```powershell
 .\deploy\run_ui.ps1 -ApiUrl "http://<Laptop-1-IP>:8000"
 ```
-This is the same as `streamlit run ui/app.py`, with the API URL entered in the sidebar.
+This is the same as `streamlit run ui/app.py`, with the API URL entered in the sidebar
+(or set beforehand with `$env:PATHSNAP_API_URL`).
 Then open `http://localhost:8501`, pick a trip and press **Run trip**, or press **Run all 10**.
 
 **API endpoints**

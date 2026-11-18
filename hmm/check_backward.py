@@ -1,6 +1,8 @@
 """Diagnose the TRUE transitions that come out impossible as 'same_arc_backward'.
 
-For each case (point t moved more than NEG_TOL_M backwards along its labelled arc):
+Run with the brief's original 10 m backwards tolerance (ANALYSIS_NEG_TOL_M), because this
+analysis is what justified raising NEG_TOL_M in transitions.py from 10 m to 30 m.
+For each case (point t moved more than 10 m backwards along its labelled arc):
   (1) does the reverse arc (to_node -> from_node) exist?
   (2) is the GPS heading over points t-5 .. t+5 opposite to the labelled arc's direction?
 Verdict per case:
@@ -26,6 +28,7 @@ from geo import to_metres, trip_origin
 from candidates import arc_geometry
 from transitions import train_true_transitions
 
+ANALYSIS_NEG_TOL_M = 10.0   # the tolerance under analysis (decoder now uses 30 m)
 WINDOW = 5         # points either side of t
 MIN_MOVE_M = 5.0   # less GPS movement than this over the window = car (almost) still
 COS_CLEAR = 0.5    # |cos| above this = clearly along / against the arc (within 60 degrees)
@@ -66,8 +69,8 @@ def classify_trip(d, cases):
 
 if __name__ == "__main__":
     root = sys.argv[1]  # path to "Student folder"
-    labels = pd.read_parquet(os.path.join(REPO, "data", "candidates", "point_labels_train.parquet"))
-    tt = train_true_transitions(root, labels)
+    labels = pd.read_parquet(os.path.join(REPO, "outputs", "candidates", "point_labels_train.parquet"))
+    tt = train_true_transitions(root, labels, neg_tol=ANALYSIS_NEG_TOL_M)
     back = tt[tt["reason"] == "same_arc_backward"]
 
     res = pd.concat([classify_trip(load_trip(os.path.join(root, "train", tid)), grp)

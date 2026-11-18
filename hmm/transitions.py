@@ -97,12 +97,12 @@ def log_transitions(g, sp, arcs_a, off_a, arcs_b, off_b, d_gc, dt, beta,
     return -np.abs(d_route - d_gc) / beta            # inf -> -inf (impossible move)
 
 
-def true_transitions(d, labels, gap_s=60):
+def true_transitions(d, labels, gap_s=60, neg_tol=NEG_TOL_M):
     """One row per step between the TRUE arcs of consecutive points (labels: tuning/eval only).
 
     gap = |d_route - d_gc| (log_t with beta = 1). When the true move comes out impossible
     (gap = inf), `reason` says why:
-      same_arc_backward : same arc, but ob is more than NEG_TOL_M behind oa
+      same_arc_backward : same arc, but ob is more than neg_tol metres behind oa
       no_path_in_cutoff : different arcs, no road path within dt * MAX_SPEED + SLACK
       other             : anything else (should never happen; kept as a check)
     Steps over gap_s seconds, and steps where a true arc is not a candidate, are skipped.
@@ -124,11 +124,12 @@ def true_transitions(d, labels, gap_s=60):
         oa, ob = s["offset"][t - 1][ia[0]], s["offset"][t][ib[0]]
         d_gc = np.hypot(s["x"][t] - s["x"][t - 1], s["y"][t] - s["y"][t - 1])
         gap = -log_transitions(g, sp, np.array([a]), np.array([oa]),
-                               np.array([b]), np.array([ob]), d_gc, dt, beta=1.0)[0, 0]
+                               np.array([b]), np.array([ob]), d_gc, dt, beta=1.0,
+                               neg_tol=neg_tol)[0, 0]
 
         reason, sp_any = "", np.nan
         if not np.isfinite(gap):
-            if a == b and ob - oa < -NEG_TOL_M:
+            if a == b and ob - oa < -neg_tol:
                 reason = "same_arc_backward"
             elif a != b:
                 reason = "no_path_in_cutoff"
@@ -150,14 +151,14 @@ def estimate_beta(tt):
     return float(finite.median() / np.log(2))
 
 
-def train_true_transitions(root, labels):
+def train_true_transitions(root, labels, neg_tol=NEG_TOL_M):
     """true_transitions() for every TRAIN trip whose labels are reliable."""
     out = []
     for tid, lab in labels.groupby("trip_id"):
         if lab["true_dist_m"].median() > MAX_MEDIAN_TRUE_DIST_M:
             continue
         out.append(true_transitions(load_trip(os.path.join(root, "train", tid)),
-                                    lab.sort_values("obs_idx")))
+                                    lab.sort_values("obs_idx"), neg_tol=neg_tol))
     return pd.concat(out, ignore_index=True)
 
 
@@ -228,7 +229,7 @@ def describe(trip_folder, beta, gap_s=60):
 
 if __name__ == "__main__":
     root = sys.argv[1]  # path to "Student folder"
-    labels = pd.read_parquet(os.path.join(REPO, "data", "candidates", "point_labels_train.parquet"))
+    labels = pd.read_parquet(os.path.join(REPO, "outputs", "candidates", "point_labels_train.parquet"))
     t0 = time.perf_counter()
     tt = train_true_transitions(root, labels)            # train only
     beta = estimate_beta(tt)

@@ -90,7 +90,7 @@ def describe(trip_folder, sigma):
 
 if __name__ == "__main__":
     root = sys.argv[1]  # path to "Student folder"
-    labels = pd.read_parquet(os.path.join(REPO, "data", "candidates", "point_labels_train.parquet"))
+    labels = pd.read_parquet(os.path.join(REPO, "outputs", "candidates", "point_labels_train.parquet"))
     sigma = estimate_sigma(labels)  # train only
     print(f"sigma estimated from train labels: {sigma:.2f} m")
     trips = sys.argv[2:] or ["train/00000046", "train/00000013", "student_test/00000056"]
